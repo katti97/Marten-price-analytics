@@ -70,20 +70,6 @@ st.markdown("""
 # Dr. Martens product data (from pricing_analysis.py.py with real prices)
 martens = [
     {
-        "product_id": "DM-CORE-1461",
-        "title": "1461 Smooth Leather Oxford",
-        "brand": "Dr Martens",
-        "category": "shoes",
-        "attributes": {
-            "color": ["black"],
-            "material": "leather",
-            "style": "oxford"
-        },
-        "image_url": "https://images.littleburgundyshoes.com/images/products/1_169507_ZM.jpg",
-        "details": "Classic 3-eye Oxford made of smooth leather with iconic Dr. Martens sole.",
-        "price": 140.00
-    },
-    {
         "product_id": "DM-CORE-1460",
         "title": "1460 Smooth Leather Lace Up Boots",
         "brand": "Dr Martens",
@@ -112,6 +98,19 @@ martens = [
         "details": "This archive-inspired rework of our Jadon boot captures the spirit of long summer days. Built from rugged Crazy Horse leather designed to mark and change with every wear. The upper is detailed with contrast ecru stitching, antique brass eyelets, hiker laces and a brown and yellow version of our heel loop."
     },
     {
+        "product_id": "41730200",
+        "title": "Zebzag Anywair Suede Mules",
+        "brand": "Dr Martens",
+        "category": "Mules", 
+        "price": 130.00,
+        "attributes": {
+            "color": ["Savannah Tan"],
+            "material": ["Bronx Suede"],  
+        },
+        "image_url": "https://images.journeys.com/images/products/1_786033_ZM_ALT5.JPG",
+        "details": "Slip sole-first into new sensations with our new Zebzag AnyWair mule. Made with soft-yet-durable Bronx suede and an adjustable Riptape strap to lock in comfort from day one. The ergonomic Zebzag sole combines lightweight EVA and rugged PVC to give your feet an easy ride without limiting your destination. And our SoftWair footbed adds extra cushioning. The sole boasts distinctive DM's signatures, with a bold tread pattern, exaggerated grooving, and our unmistakable yellow welt stitching."
+    },
+    {
         "product_id": "DM-CORE-JOSEF",
         "title": "Josef Suede Slide Sandals",
         "brand": "Dr Martens",
@@ -137,7 +136,7 @@ birkenstock_prod_list = [
     "https://www.birkenstock.com/us/highwood-slip-on-men-natural-leather/highwood-gripwalk-naturalleather-0-rubber-m_1.html",
     "https://www.birkenstock.com/us/reykjavik-nubuk-leather/reykjavik-idealschuh-nubuckleather-0-tpu-u_2087.html",
     # Using the Pasadena URL that works from app1.py for better matching with shoes
-    "https://www.birkenstock.com/us/pasadena-suede-leather/pasadena-suede-suedeleather-0-pu-u_1.html", 
+    "https://www.birkenstock.com/us/pasadena-suede-leather/pasadena-suede-suedeleather-0-pu-u_1.html",
     "https://www.birkenstock.com/us/highwood-lace-mid-men-natural-leather/highwood-266994-naturalleather-0-rubber-m_1.html",
     "https://www.birkenstock.com/us/highwood-slip-on-women-natural-leather/highwood-gripwalk-naturalleather-0-rubber-w_1428.html",
     "https://www.birkenstock.com/us/uji-nubuck-leather%2Fsuede/uji-suede-nubucksuedeleather-0-eva-u_2215.html",
@@ -146,7 +145,11 @@ birkenstock_prod_list = [
     "https://www.birkenstock.com/us/arizona-big-buckle-eva-eva/arizonabig-evabigbuckle-eva-274820-eva-w_19.html",
     "https://www.birkenstock.com/us/arizona-pap-flex-platform-birko-flor/arizonapapflexplatform-platformbasic-birkoflor-0-evaplateau-w_19.html",
     "https://www.birkenstock.com/us/arizona-big-buckle-eva-eva/arizonabig-evabigbuckle-eva-274820-eva-w_1702.html",
-    "https://www.birkenstock.com/us/highwood-lace-mid-m-waterproof-natural-leather/highwoodlace-waterproof-naturalleather-S005252-rubber-u_1428.html"
+    "https://www.birkenstock.com/us/highwood-lace-mid-m-waterproof-natural-leather/highwoodlace-waterproof-naturalleather-S005252-rubber-u_1428.html",
+    "https://www.birkenstock.com/us/boston-soft-footbed-suede-leather/boston-suede-suedeleather-softfootbed-eva-u_491.html",
+    "https://www.birkenstock.com/us/boston-suede-leather/boston-core-suedeleather-0-evarubber-u_1704.html",
+    "https://www.birkenstock.com/us/boston-shearling-suede-leather/boston-shearling-suedeleather-0-eva-u_46.html",
+    "https://www.birkenstock.com/us/boston-shearling-suede-leather/boston-shearling-suedeleather-0-eva-u_491.html"
 ]
 
 # Helper functions (from pricing_analysis.py.py)
@@ -356,7 +359,7 @@ def calculate_similarities():
             return "sandal"
         elif "oxford" in full_text or "slip" in full_text or "loafer" in full_text or "pasadena" in full_text:
             return "slip_on"
-        elif "mule" in full_text:
+        elif "mule" in full_text or "boston" in full_text:
             return "mule"
         else:
             return "other"
@@ -366,6 +369,8 @@ def calculate_similarities():
         name = product.get("title", "").lower() + " " + product.get("product_name", "").lower()
         if "josef" in name:
             return "josef"
+        elif "zebzag" in name:
+            return "zebzag"
         elif "1461" in name or "oxford" in name:
             return "oxford"
         elif "1460" in name or "boot" in name:
@@ -376,30 +381,52 @@ def calculate_similarities():
             return "generic"
     
     # Helper function: Check if Birkenstock product matches target type
-    def is_target_birkenstock(birk_name, target_type):
+    def is_target_birkenstock(birk_name, birk_url, target_type):
         birk_lower = birk_name.lower()
+        url_lower = birk_url.lower()
+        
         if target_type == "arizona_flex":
             return "arizona" in birk_lower and "flex" in birk_lower and "platform" in birk_lower
         elif target_type == "arizona_big":
             return "arizona" in birk_lower and "big" in birk_lower and "buckle" in birk_lower
         elif target_type == "pasadena":
             return "pasadena" in birk_lower
+        elif target_type == "boston":
+            return "boston" in birk_lower or "boston" in url_lower
         return False
+    
+    # Helper function: Get Zebzag color priority score
+    def get_zebzag_color_priority(birk_name, birk_url):
+        """
+        Returns color priority for Zebzag matching:
+        - Latte Cream: highest priority (0.20)
+        - Mink: second priority (0.15)
+        - Taupe: third priority (0.10)
+        - Other suede colors: base (0.05)
+        """
+        combined_text = (birk_name + " " + birk_url).lower()
+        
+        if "latte" in combined_text or "cream" in combined_text:
+            return 0.20
+        elif "mink" in combined_text:
+            return 0.15
+        elif "taupe" in combined_text:
+            return 0.10
+        elif "suede" in combined_text:
+            return 0.05
+        else:
+            return 0.0
     
     # Helper function: Calculate style match score
     def get_style_bonus(mart_style, birk_style):
-        # Perfect match gets highest bonus
         if mart_style == birk_style:
             return 0.50
-        # Sandals and slip-ons are distinct categories
         elif mart_style == "sandal" and birk_style == "sandal":
             return 0.50
         elif mart_style == "boot" and birk_style == "boot":
             return 0.50
-        # Mules at Marten's match with similar styles at Birkenstock
-        elif mart_style == "mule" and birk_style in ["slip_on", "sandal"]:
-            return 0.40
-        # Slight bonus for related styles
+        elif mart_style == "mule" and birk_style in ["slip_on", "sandal", "mule"]:
+            return 0.45
         elif (mart_style == "slip_on" and birk_style in ["oxford", "slip_on"]) or \
              (mart_style == "boot" and birk_style == "slip_on"):
             return 0.25
@@ -411,21 +438,17 @@ def calculate_similarities():
         if not mart_materials or not birk_materials:
             return 0.0
         
-        # Normalize materials
         mart_norm = [normalize_material(m) for m in mart_materials]
         birk_norm = [normalize_material(b) for b in birk_materials]
         
-        # Perfect material match
         for m in mart_norm:
             if m in birk_norm:
                 return 0.35
         
-        # Suede/Nubuck are closely related
         if any(m in ["suede", "nubuck"] for m in mart_norm) and \
            any(b in ["suede", "nubuck"] for b in birk_norm):
             return 0.30
         
-        # Leather variants are compatible
         if any("leather" in m for m in mart_norm) and \
            any("leather" in b for b in birk_norm):
             return 0.25
@@ -441,10 +464,8 @@ def calculate_similarities():
         mart_colors_lower = [c.lower() for c in mart_colors]
         
         for color in mart_colors_lower:
-            # Exact color match
             if color in birk_lower:
                 return 0.15
-            # Close color matches
             if color == "black" and "black" in birk_lower:
                 return 0.15
             elif color in ["brown", "tan", "cognac"] and any(c in birk_lower for c in ["brown", "tan", "cognac"]):
@@ -464,14 +485,11 @@ def calculate_similarities():
         
         price_diff = mart_price - birk_price
         
-        # If Birkenstock item is on sale, recommend adjusting Martens price
         if birk_original and birk_sale and birk_original > birk_sale:
             discount_pct = ((birk_original - birk_sale) / birk_original) * 100
-            # Apply 10-15% premium on top of Birkenstock's sale price
             recommended = birk_sale * 1.12
             return round(recommended, 2), discount_pct
         else:
-            # Standard 10-20% premium over Birkenstock
             recommended = birk_price * 1.15
             return round(recommended, 2), 0.0
     
@@ -512,38 +530,48 @@ def calculate_similarities():
                     img_score = 0.0
 
             # --- HIERARCHICAL MATCHING LOGIC ---
-            # Priority 1: Style/Category Match (HIGHEST)
             style_bonus = get_style_bonus(mart_style, birk_style)
-            
-            # Priority 2: Material Match (MEDIUM-HIGH)
             material_bonus = get_material_bonus(mart_materials, birk_materials)
-            
-            # Priority 3: Color Match (MEDIUM)
             color_bonus = get_color_bonus(mart_colors, birk_name)
             
             # --- SPECIAL PRODUCT-TO-PRODUCT MATCHING ---
             special_boost = 0.0
             
-            # Josef Suede Sandals’ Arizona Flex Platform (TOP PRIORITY)
+            # Josef Suede Sandals → Arizona Flex Platform (TOP PRIORITY)
             if mart_identifier == "josef":
-                if is_target_birkenstock(birk_name, "arizona_flex"):
-                    special_boost = 1.0  # Maximum boost - makes this the definite top match
+                if is_target_birkenstock(birk_name, birk_url, "arizona_flex"):
+                    special_boost = 1.0
                     style_bonus = 0.55
                     material_bonus = 0.35
-                elif is_target_birkenstock(birk_name, "arizona_big"):
-                    special_boost = 0.95  # Second priority
+                elif is_target_birkenstock(birk_name, birk_url, "arizona_big"):
+                    special_boost = 0.95
                     style_bonus = 0.55
                     material_bonus = 0.35
             
-            # 1461 Oxford â†’ Pasadena Suede (TOP PRIORITY for slip-on)
+            # Zebzag Suede Mules → Boston products (TOP PRIORITY)
+            elif mart_identifier == "zebzag":
+                if is_target_birkenstock(birk_name, birk_url, "boston"):
+                    special_boost = 1.0  # Maximum boost for Boston match
+                    style_bonus = 0.55
+                    
+                    # Enhanced material bonus for suede match
+                    if any("suede" in normalize_material(m) for m in birk_materials):
+                        material_bonus = 0.40  # Higher bonus for suede material
+                    else:
+                        material_bonus = 0.30
+                    
+                    # Add color priority bonus (Latte Cream > Mink > Taupe)
+                    color_priority = get_zebzag_color_priority(birk_name, birk_url)
+                    color_bonus = color_priority
+            
+            # 1461 Oxford → Pasadena Suede (TOP PRIORITY for slip-on)
             elif mart_identifier == "oxford":
-                if is_target_birkenstock(birk_name, "pasadena"):
-                    special_boost = 0.95  # High boost for Pasadena match
+                if is_target_birkenstock(birk_name, birk_url, "pasadena"):
+                    special_boost = 0.95
                     style_bonus = 0.55
                     material_bonus = 0.30
             
-            # --- NEW WEIGHTING (Hierarchical with special product matching) ---
-            # Special Product Match (0.50 if matched) + Style (0.30) + Material (0.15) + Color (0.05)
+            # --- WEIGHTING (Hierarchical with special product matching) ---
             combined = special_boost + (style_bonus * 0.30) + (material_bonus * 0.15) + (color_bonus * 0.05)
             
             # Price recommendation
@@ -577,8 +605,6 @@ def calculate_similarities():
             "similarities": sim_list
         })
     return results
-# Main app
-# st.markdown('<h1 style="color: white; text-align: center; margin-bottom: 40px;">Product Similarity Matcher</h1>', unsafe_allow_html=True)
 
 # Calculate similarities with progress indicator
 with st.spinner("Loading product data and calculating similarities..."):
